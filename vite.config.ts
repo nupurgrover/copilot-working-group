@@ -12,4 +12,9 @@ export default defineConfig({
     }),
     TanStackRouterVite(),
   ],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+  },
 });
