@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
+import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ProductDetail } from './index';
 import { CartProvider } from '../../contexts/CartContext';
 import type { Product } from '../../types/product';
 
-// Mock product data that can be modified per test
-let mockProductData: Product | null = {
+// Factory function to create mock product data
+const createMockProduct = (overrides?: Partial<Product>): Product => ({
   id: 1,
   title: 'iPhone 15 Pro',
   description: 'Latest iPhone with advanced features',
@@ -20,7 +20,11 @@ let mockProductData: Product | null = {
   returnPolicy: '30 days return policy',
   thumbnail: 'https://example.com/iphone-thumb.jpg',
   images: ['https://example.com/iphone-1.jpg', 'https://example.com/iphone-2.jpg'],
-};
+  ...overrides,
+});
+
+// Mock product data that can be modified per test
+let mockProductData: Product | null = createMockProduct();
 
 // Mock the router
 vi.mock('@tanstack/react-router', () => ({
@@ -55,22 +59,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 
 describe('ProductDetail Component - Behavior Tests', () => {
   it('renders product image and title correctly based on product data', () => {
-    // Reset to default product
-    mockProductData = {
-      id: 1,
-      title: 'iPhone 15 Pro',
-      description: 'Latest iPhone with advanced features',
-      category: 'smartphones',
-      price: 1299.99,
-      rating: 4.8,
-      stock: 25,
-      brand: 'Apple',
-      availabilityStatus: 'In Stock',
-      returnPolicy: '30 days return policy',
-      thumbnail: 'https://example.com/iphone-thumb.jpg',
-      images: ['https://example.com/iphone-1.jpg', 'https://example.com/iphone-2.jpg'],
-    };
-
+    mockProductData = createMockProduct();
     renderWithProviders(<ProductDetail />);
 
     // Verify the product image is displayed
@@ -85,22 +74,7 @@ describe('ProductDetail Component - Behavior Tests', () => {
   });
 
   it('displays product price, stock, and rating accurately', () => {
-    // Reset to default product
-    mockProductData = {
-      id: 1,
-      title: 'iPhone 15 Pro',
-      description: 'Latest iPhone with advanced features',
-      category: 'smartphones',
-      price: 1299.99,
-      rating: 4.8,
-      stock: 25,
-      brand: 'Apple',
-      availabilityStatus: 'In Stock',
-      returnPolicy: '30 days return policy',
-      thumbnail: 'https://example.com/iphone-thumb.jpg',
-      images: ['https://example.com/iphone-1.jpg', 'https://example.com/iphone-2.jpg'],
-    };
-
+    mockProductData = createMockProduct();
     renderWithProviders(<ProductDetail />);
 
     // Verify price is displayed with correct formatting
@@ -121,22 +95,10 @@ describe('ProductDetail Component - Behavior Tests', () => {
   });
 
   it('shows appropriate information for edge cases like low stock or unavailable brand', () => {
-    // Create product with edge case: low stock and no brand
-    mockProductData = {
-      id: 2,
-      title: 'Budget Smartphone',
-      description: 'Affordable smartphone',
-      category: 'smartphones',
-      price: 199.99,
-      rating: 3.5,
+    mockProductData = createMockProduct({
       stock: 3,
       brand: undefined,
-      availabilityStatus: 'Low Stock',
-      returnPolicy: '14 days return policy',
-      thumbnail: 'https://example.com/budget-thumb.jpg',
-      images: ['https://example.com/budget-1.jpg'],
-    };
-
+    });
     renderWithProviders(<ProductDetail />);
 
     // Verify low stock number is displayed
@@ -151,22 +113,7 @@ describe('ProductDetail Component - Behavior Tests', () => {
   });
 
   it('triggers add to cart action when button is clicked', async () => {
-    // Reset to default product
-    mockProductData = {
-      id: 1,
-      title: 'iPhone 15 Pro',
-      description: 'Latest iPhone with advanced features',
-      category: 'smartphones',
-      price: 1299.99,
-      rating: 4.8,
-      stock: 25,
-      brand: 'Apple',
-      availabilityStatus: 'In Stock',
-      returnPolicy: '30 days return policy',
-      thumbnail: 'https://example.com/iphone-thumb.jpg',
-      images: ['https://example.com/iphone-1.jpg', 'https://example.com/iphone-2.jpg'],
-    };
-
+    mockProductData = createMockProduct();
     const user = userEvent.setup();
     renderWithProviders(<ProductDetail />);
 
